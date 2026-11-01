@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>蛇伤识别辅助系统</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+
+    <!-- ========== 问诊信息页 ========== -->
+    <div id="page-survey" class="page active">
+        <header class="page-header">
+            <h1>蛇伤问诊</h1>
+            <p class="subtitle">请填写以下信息，辅助识别与救治</p>
+        </header>
+
+        <!-- 卡片 1：伤口判断（首项，选填） -->
+        <section class="card">
+            <div class="card-title">伤口判断</div>
+
+            <!-- 无毒蛇咬伤 -->
+            <div class="wound-block wound-safe">
+                <div class="wound-block-head">
+                    <span class="wound-badge wound-badge-safe">无毒蛇咬伤</span>
+                    <span class="wound-hint">示例特征对照</span>
+                </div>
+                <div class="wound-examples">
+                    <div class="wound-img-wrap">
+                        <img src="../img/wound-nonvenom-1.jpg" alt="无毒蛇咬伤示例图1"
+                             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                        <div class="img-placeholder" style="display:none">示例图 1<br>无毒蛇咬伤</div>
+                    </div>
+                    <div class="wound-img-wrap">
+                        <img src="../img/wound-nonvenom-2.jpg" alt="无毒蛇咬伤示例图2"
+                             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                        <div class="img-placeholder" style="display:none">示例图 2<br>无毒蛇咬伤</div>
+                    </div>
+                </div>
+                <ul class="wound-features">
+                    <li>牙痕：多排细小、浅表，常呈弧形或梳齿状排列（约 8~12 个细点）</li>
+                    <li>局部：无明显肿胀或淤血，出血少、表浅</li>
+                    <li>全身：一般无明显中毒症状</li>
+                </ul>
+            </div>
+
+            <!-- 毒蛇咬伤 -->
+            <div class="wound-block wound-danger">
+                <div class="wound-block-head">
+                    <span class="wound-badge wound-badge-danger">毒蛇咬伤</span>
+                    <span class="wound-hint">文字特征对照</span>
+                </div>
+                <ul class="wound-features">
+                    <li>牙痕：多为一对明显、深而大的毒牙孔（呈两点，间距较大）</li>
+                    <li>局部：明显肿胀、剧痛、出血不止，可出现瘀斑、组织坏死</li>
+                    <li>需警惕：部分神经毒蛇（如银环蛇）局部伤口轻，但可迅速出现呼吸困难等全身症状</li>
+                </ul>
+            </div>
+
+            <p class="wound-note">以上特征仅作初步对照，不能据此判断是否中毒。被咬伤请立即就医。</p>
+
+            <div class="upload-area">
+                <label class="upload-btn" for="wound-photo">📷 上传我的伤口照片</label>
+                <input type="file" id="wound-photo" accept="image/*" style="display:none">
+                <div id="wound-preview" class="wound-preview" style="display:none">
+                    <img id="wound-preview-img" alt="伤口照片预览">
+                    <button type="button" class="remove-preview" onclick="removeWoundPhoto()">删除</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 卡片 2：基本信息 -->
+        <section class="card">
+            <div class="card-title">基本信息</div>
+
+            <!-- 蛇伤时间（必填，时间选择器） -->
+            <div class="form-item required" id="item-bite-time">
+                <label class="form-label" for="bite-time">蛇伤时间<span class="required-star">*</span></label>
+                <input type="datetime-local" id="bite-time" class="form-input">
+            </div>
+
+            <!-- 蛇伤场所（必填，单选行） -->
+            <div class="form-item required" id="item-place">
+                <div class="select-row" id="place-row" onclick="openSelectPanel('place')">
+                    <span class="form-label inline-label">蛇伤场所<span class="required-star">*</span></span>
+                    <span class="select-value" id="place-value">请选择</span>
+                    <span class="select-arrow">›</span>
+                </div>
+            </div>
+
+            <!-- 所在省份（必填，下拉单选） -->
+            <div class="form-item required" id="item-province">
+                <label class="form-label" for="province">所在省份<span class="required-star">*</span></label>
+                <select id="province" class="form-select">
+                    <option value="">请选择</option>
+                </select>
+            </div>
+
+            <!-- 咬伤部位（必填，单选行） -->
+            <div class="form-item required" id="item-body">
+                <div class="select-row" id="body-row" onclick="openSelectPanel('body')">
+                    <span class="form-label inline-label">咬伤部位<span class="required-star">*</span></span>
+                    <span class="select-value" id="body-value">请选择</span>
+                    <span class="select-arrow">›</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 卡片 3：处置与症状 -->
+        <section class="card">
+            <div class="card-title">处置与症状</div>
+
+            <!-- 院前处置（必填，两列多选） -->
+            <div class="form-item required" id="item-treatment">
+                <div class="form-label">院前处置<span class="required-star">*</span></div>
+                <div class="checkbox-grid" id="treatment-grid"></div>
+            </div>
+
+            <!-- 症状（必填，两列多选） -->
+            <div class="form-item required" id="item-symptom">
+                <div class="form-label">症状<span class="required-star">*</span></div>
+                <div class="checkbox-grid" id="symptom-grid"></div>
+                <input type="text" id="symptom-other" class="form-input"
+                       placeholder="请注明其他症状" style="display:none; margin-top:8px">
+            </div>
+
+            <!-- 过往病史（选填，文本框） -->
+            <div class="form-item" id="item-history">
+                <label class="form-label" for="history">过往病史</label>
+                <textarea id="history" class="form-textarea" rows="3"
+                          placeholder="过敏史、慢性病、当前用药等"></textarea>
+            </div>
+        </section>
+
+        <!-- 底部通栏主按钮 -->
+        <div class="bottom-bar">
+            <button type="button" class="btn-primary" onclick="submitSurvey()">提交问诊信息</button>
+        </div>
+    </div>
+
+    <!-- ========== 结果页 ========== -->
+    <div id="page-result" class="page">
+        <header class="page-header">
+            <h1>识别结果</h1>
+        </header>
+
+        <!-- 问诊摘要 -->
+        <section class="card">
+            <div class="card-title">问诊摘要</div>
+            <div id="survey-summary"></div>
+        </section>
+
+        <!-- 蛇种识别（本轮假数据） -->
+        <section class="card">
+            <div class="card-title">蛇种识别</div>
+            <div id="recognition-result"></div>
+            <p class="result-note">⚠ 本轮为演示数据，下一轮将接入真实模型</p>
+        </section>
+
+        <!-- 风险等级与血清建议 -->
+        <section class="card" id="card-serum">
+            <div class="card-title">风险等级与血清建议</div>
+            <div id="serum-advice"></div>
+        </section>
+
+        <!-- 免责声明 -->
+        <section class="card disclaimer">
+            <p>本工具输出为辅助参考，不能替代专业医疗诊断。被蛇咬伤后请立即前往医院，切勿因等待识别结果而延误就医。血清使用必须遵医嘱。</p>
+        </section>
+
+        <div class="bottom-bar">
+            <button type="button" class="btn-secondary" onclick="backToSurvey()">返回修改</button>
+        </div>
+    </div>
+
+    <!-- ========== 单选弹出面板（底部 Action Sheet） ========== -->
+    <div id="select-panel" class="select-panel-mask" style="display:none" onclick="closeSelectPanel(event)">
+        <div class="select-panel">
+            <div class="select-panel-header">
+                <span id="select-panel-title">请选择</span>
+                <button type="button" class="select-panel-cancel" onclick="closeSelectPanel()">取消</button>
+            </div>
+            <div id="select-panel-options" class="select-panel-options"></div>
+        </div>
+    </div>
+
+</div>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>蛇小助 SnakeGuard · AI 毒蛇识别与院前风险预判平台</title>
+    <meta name="description" content="基于 ResNet18 深度学习的毒蛇识别系统，秒级识别 13 种常见毒蛇，输出风险分级与血清用药建议，辅助院前急救决策。">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ==================== 顶部导航 ==================== -->
+<header class="nav" id="nav">
+    <div class="nav-inner container">
+        <a class="brand" href="#home" data-scroll>
+            <span class="brand-mark">◈</span>
+            <span class="brand-text">蛇小助 <em>SnakeGuard</em></span>
+        </a>
+        <nav class="nav-links" id="nav-links">
+            <a href="#recognition" data-scroll>在线识别</a>
+            <a href="#features" data-scroll>核心能力</a>
+            <a href="#species" data-scroll>物种库</a>
+            <a href="app/navigate.html">附近血清医院</a>
+            <a href="#firstaid" data-scroll>急救知识</a>
+            <a href="#tech" data-scroll>技术路线</a>
+            <a href="#faq" data-scroll>常见问题</a>
+        </nav>
+        <div class="nav-actions">
+            <a class="btn btn-ghost btn-sm nav-survey" href="app/survey.html" target="_blank" rel="noopener">急救问诊</a>
+            <a class="btn btn-primary btn-sm" href="#recognition" data-scroll>立即识别</a>
+            <button class="nav-burger" id="nav-burger" aria-label="菜单">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- ==================== Hero ==================== -->
+<section class="hero" id="home">
+    <div class="hero-deco" aria-hidden="true"></div>
+    <div class="container hero-grid">
+        <div class="hero-copy">
+            <div class="hero-eyebrow"><span class="pill">华为云 ICT 创新大赛作品</span></div>
+            <h1 class="hero-title">AI 秒级辨识 <span class="accent">毒蛇</span>，<br>为生命争取黄金时间</h1>
+            <p class="hero-sub">
+                基于深度学习的蛇类图像识别系统，覆盖我国常见 <b>13 种毒蛇</b>。
+                识别结果联动<b>风险分级</b>与<b>血清用药</b>建议，辅助院前急救决策，助力基层医疗与野外安全。
+            </p>
+            <div class="hero-cta">
+                <a class="btn btn-primary btn-lg" href="#recognition" data-scroll>开始识别蛇种</a>
+                <a class="btn btn-ghost btn-lg" href="#species" data-scroll>浏览物种库</a>
+            </div>
+            <ul class="hero-proof">
+                <li><b>300ms</b>&nbsp;级推理</li>
+                <li><b>13</b>&nbsp;类毒蛇覆盖</li>
+                <li><b>Top-3</b>&nbsp;候选输出</li>
+                <li><b>本地</b>&nbsp;隐私保护</li>
+            </ul>
+        </div>
+
+        <div class="hero-visual">
+            <div class="hero-card">
+                <div class="hero-card-img">
+                    <img id="hero-snake" src="img/species/眼镜王蛇-1.jpg" alt="眼镜王蛇识别实例">
+                    <div class="hero-card-frame"></div>
+                </div>
+                <div class="hero-card-result">
+                    <div class="hero-card-head">
+                        <span class="dot dot-2"></span>
+                        <span>识别结果</span>
+                        <span class="hero-card-time">0.31s</span>
+                    </div>
+                    <div class="hero-card-species">
+                        <span class="tag tag-danger">剧毒</span>
+                        <strong>眼镜王蛇</strong>
+                        <span class="conf">置信度 98.7%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 数据条 -->
+    <div class="stats container">
+        <div class="stat"><b>13</b><span>类目标毒蛇</span></div>
+        <div class="stat"><b>224×224</b><span>输入分辨率</span></div>
+        <div class="stat"><b>Top-3</b><span>候选排序输出</span></div>
+        <div class="stat"><b>ResNet18</b><span>骨干网络</span></div>
+    </div>
+</section>
+
+<main>
+
+<!-- ==================== 在线识别中心 ==================== -->
+<section class="section" id="recognition">
+    <div class="container">
+        <div class="section-head">
+            <span class="kicker">在线识别</span>
+            <h2>上传照片，识别蛇种与风险</h2>
+            <p>支持 jpg / png 等常见图片格式。识别结果含候选列表、毒性等级、风险分级与血清建议，仅供参考，不构成医疗诊断。</p>
+        </div>
+
+        <div class="recognition-grid">
+            <!-- 上传区 -->
+            <div class="panel upload-panel">
+                <div class="dropzone" id="dropzone">
+                    <input type="file" id="file-input" accept="image/*" aria-label="选择蛇类图片">
+                    <div class="dz-empty" id="dz-empty">
+                        <div class="dz-icon">📷</div>
+                        <p class="dz-title">拖拽图片到这里，或点击选择</p>
+                        <p class="dz-sub">上传一张清晰的毒蛇全身照</p>
+                    </div>
+                    <img id="dz-preview" class="dz-preview" alt="待识别图片预览" style="display:none">
+                    <button type="button" class="dz-remove" id="dz-remove" aria-label="移除图片" style="display:none">✕</button>
+                </div>
+                <div class="upload-actions">
+                    <button class="btn btn-primary btn-block" id="btn-recognize" disabled>上传并识别</button>
+                    <label class="link-btn" for="file-input">重新选择图片</label>
+                </div>
+                <p class="dropzone-note">演示数据阶段：识别使用内置示例结果；接入真实接口后自动切换。</p>
+            </div>
+
+            <!-- 结果区 -->
+            <div class="panel result-panel">
+                <div class="result-empty" id="result-empty">
+                    <div class="result-empty-icon"></div>
+                    <p>上传图片后，点击「上传并识别」<br>此处将展示识别结果与风险建议</p>
+                </div>
+                <div class="result-body" id="result-body" style="display:none"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== 核心能力 ==================== -->
+<section class="section section-soft" id="features">
+    <div class="container">
+        <div class="section-head">
+            <span class="kicker">核心能力</span>
+            <h2>识别之外，更关注「接下来怎么办」</h2>
+            <p>从「这是什么蛇」到「有多大风险、该用什么血清」，一站式辅助院前决策。</p>
+        </div>
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <h3>秒级识别</h3>
+                <p>端侧 300ms 级推理，出片即出结果，不依赖人工经验，基层人员也能快速判断。</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🧬</div>
+                <h3>毒性多重确认</h3>
+                <p>Top-3 候选 + 置信度排序，相近蛇种可并列展示，降低单一判断的误报风险。</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">⚠️</div>
+                <h3>风险分级</h3>
+                <p>自动映射「极高/高/低」三级风险与毒性标签，提示紧急程度与续治方向。</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">💉</div>
+                <h3>血清用药建议</h3>
+                <p>联动抗蛇毒血清知识库，输出适配血清类型，辅助急诊备药与院前沟通。</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🛡️</div>
+                <h3>隐私保护</h3>
+                <p>支持端侧识别，照片本地处理，不上传云端，保障灾情与个人隐私安全。</p>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🗺️</div>
+                <h3>区域适配</h3>
+                <p>按省份与场所做先验收敛，结合咬伤部位问诊，进一步提升判定准确率。</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== 识别流程 ==================== -->
+<section class="section" id="how">
+    <div class="container">
+        <div class="section-head">
+            <span class="kicker">三步识别</span>
+            <h2>把「看清楚」变成「可决策」</h2>
+        </div>
+        <div class="steps">
+            <div class="step">
+                <span class="step-num">01</span>
+                <h3>拍照上传</h3>
+                <p>对被咬伤的蛇或现场照片拍照，上传清晰全身或头部特征图。</p>
+            </div>
+            <div class="step">
+                <span class="step-num">02</span>
+                <h3>AI 识别</h3>
+                <p>ResNet18 提取特征 → 输出 13 类 Top-3 候选及置信度。</p>
+            </div>
+            <div class="step">
+                <span class="step-num">03</span>
+                <h3>决策支持</h3>
+                <p>综合毒性、风险分级、血清建议与急救提示，辅助就医与备药。</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== 物种库 ==================== -->
+<section class="section section-soft" id="species">
+    <div class="container">
+        <div class="section-head">
+            <span class="kicker">毒蛇物种库</span>
+            <h2>覆盖我国常见 <span class="accent">13 种</span>毒蛇</h2>
+            <p>点击卡片查看特征、分布与对应血清建议。</p>
+        </div>
+        <div class="species-filter" id="species-filter">
+            <button class="chip active" data-filter="all">全部</button>
+            <button class="chip" data-filter="剧毒">剧毒</button>
+            <button class="chip" data-filter="微毒">微毒</button>
+        </div>
+        <div class="species-grid" id="species-grid"></div>
+    </div>
+</section>
+
+<!-- ==================== 急救知识 ==================== -->
+<section class="section" id="firstaid">
+    <div class="container">
+        <div class="section-head">
+            <span class="kicker">急救知识</span>
+            <h2>被毒蛇咬伤，第一时间这样做</h2>
+            <p>遇到蛇伤，识别只是辅助，正确急救与及时就医才是关键。以下为通用院前处理要点。</p>
+        </div>
+        <div class="firstaid-grid">
+            <div class="firstaid-card firstaid-danger">
+                <h3>🔴 立即停止活动</h3>
+                <p>保持安静、尽量减少活动，让患肢低于心脏位置，减缓毒液扩散，尽快求助并拨打急救电话 120。</p>
+            </div>
+            <div class="firstaid-card">
+                <h3>🟡 去除束缚物</h3>
+                <p>尽快取下戒指、手镯、手表等可能妨碍肿胀的物品；不要饮酒、不要奔跑。</p>
+            </div>
+            <div class="firstaid-card">
+                <h3>🟢 正确固定包扎</h3>
+                <p>用宽松绑带固定患肢（以能插入一指为度，勿过紧），避免剧烈加压包扎与伤口切开。</p>
+            </div>
+            <div class="firstaid-card">
+                <h3>🔵 记录与就医</h3>
+                <p>拍下蛇的照片或记住特征，速送有抗蛇毒血清的医院。切勿用嘴吸、刀割、火烧等偏方。</p>
+            </div>
+        </div>
+        <div class="firstaid-disclaimer">
+            ⚠️ 以上为通用小贴士，不构成医疗建议。发生蛇伤请立即就医，识别结果请以专业诊断为准。
+        </div>
+    </div>
+</section>
+
+<!-- ==================== 技术路线 ==================== -->
+<section class="section section-dark" id="tech">
+    <div class="container">
+        <div class="section-head light">
+            <span class="kicker">技术路线</span>
+            <h2>工程化落地的图像识别方案</h2>
+            <p>面向华为云 ModelArts 标准在线服务，完成的训练→部署→调用链路。</p>
+        </div>
+        <div class="tech-grid">
+            <div class="tech-item">
+                <b>01</b>
+                <h3>数据与训练</h3>
+                <p>采集并整理 13 类毒蛇图像，拆分训练/验证集，统一 Resize(256)→CenterCrop(224) 预处理。</p>
+            </div>
+            <div class="tech-item">
+                <b>02</b>
+                <h3>模型结构</h3>
+                <p>基于 PyTorch ResNet18，替换分类头，输出 13 类 softmax 概率；轻量、易部署至 CPU 规格。</p>
+            </div>
+            <div class="tech-item">
+                <b>03</b>
+                <h3>在线服务</h3>
+                <p>封装 ModelArts 推理代码，接收 multipart 图片，返回每张图的 Top-3 候选与置信度。</p>
+            </div>
+            <div class="tech-item">
+                <b>04</b>
+                <h3>前端联动</h3>
+                <p>识别结果联动毒性与血清知识库，输出风险分级与用药建议，形成完整决策闭环。</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== 常见问题 ==================== -->
+<section class="section" id="faq">
+    <div class="container narrow">
+        <div class="section-head">
+            <span class="kicker">常见问题</span>
+            <h2>FAQ</h2>
+        </div>
+        <div class="faq" id="faq">
+            <div class="faq-item open">
+                <button class="faq-q" type="button">识别结果一定准确吗？<span class="faq-arrow"></span></button>
+                <div class="faq-a"><p>不保证 100% 准确。系统以 Top-3 候选 + 置信度输出，供辅助参考。任何结果都不能替代专业医疗诊断，被咬伤请立即就医。</p></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" type="button">照片会上传到云端吗？<span class="faq-arrow"></span></button>
+                <div class="faq-a"><p>支持端侧识别，默认照片本地处理。若调用在线服务，仅用于识别目的并即时返回，不用于其他用途。</p></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" type="button">识别失败或置信度过低怎么办？<span class="faq-arrow"></span></button>
+                <div class="faq-a"><p>请更换更清晰、完整、光线充足的照片重试。置信度低于阈值时会提示「无法确定」，此时请按急救知识处理并及时就医。</p></div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" type="button">后续如何接入真实模型接口？<span class="faq-arrow"></span></button>
+                <div class="faq-a"><p>当前为演示数据。将 config.js 中 USE_MOCK 置为 false，并填入 API.url 与 API.key，即可切换为真实 ModelArts 在线服务调用。</p></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== 底部 ==================== -->
+<footer class="footer">
+    <div class="container footer-inner">
+        <div class="footer-brand">
+            <span class="brand-mark">◈</span>
+            <span>蛇小助 SnakeGuard</span>
+            <p>AI 驱动的毒蛇识别与院前风险预判平台</p>
+        </div>
+        <div class="footer-col">
+            <h4>产品</h4>
+            <a href="#recognition" data-scroll>在线识别</a>
+            <a href="app/navigate.html">附近血清医院</a>
+            <a href="#species" data-scroll>物种库</a>
+            <a href="app/survey.html" target="_blank" rel="noopener">急救问诊</a>
+        </div>
+        <div class="footer-col">
+            <h4>项目</h4>
+            <a href="#tech" data-scroll>技术路线</a>
+            <a href="#faq" data-scroll>常见问题</a>
+            <a href="#firstaid" data-scroll>急救知识</a>
+        </div>
+    </div>
+    <div class="container footer-disclaimer">
+        <p>本系统输出仅为辅助参考，不构成医疗诊断。被蛇咬伤后请立即前往医院，切勿因等待识别结果而延误就医；抗蛇毒血清使用必须遵医嘱。</p>
+        <p class="footer-copy">© 2026 蛇小助 SnakeGuard · 华为云 ICT 创新大赛作品</p>
+    </div>
+</footer>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

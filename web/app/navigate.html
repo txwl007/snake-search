@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>附近血清医院 · 蛇小卫</title>
+    <meta name="description" content="按直线距离查找附近储备抗蛇毒血清的医院，辅助就近就医与院前决策。">
+    <link rel="stylesheet" href="navigate.css">
+</head>
+<body>
+
+<!-- 顶栏（与首页风格一致） -->
+<header class="site-topbar">
+    <div class="site-topbar-inner">
+        <a class="site-brand" href="../index.html"><span class="mk">◈</span>蛇小卫 <em>SnakeGuard</em></a>
+        <a class="back" href="../index.html">← 返回首页</a>
+    </div>
+</header>
+
+<div class="app">
+
+    <!-- 固定免责声明 -->
+    <div class="disclaimer">
+        数据来自各省卫健委公开公示，非实时库存，出发前请先电话确认；本工具不提供医疗建议，蛇伤请尽快就医。
+    </div>
+
+    <div class="page-head">
+        <h1>附近有血清的医院</h1>
+        <p>按<b>直线距离</b>查找附近储备抗蛇毒血清的医院，辅助就近就医。</p>
+    </div>
+
+    <!-- 识别联动：按血清品种筛选 -->
+    <div class="serum-banner" id="serumBanner" hidden>
+        <span id="serumBannerText"></span>
+        <button type="button" class="banner-clear" id="serumClearBtn">清除筛选</button>
+    </div>
+
+    <!-- 定位状态区 -->
+    <section class="locator">
+        <button type="button" class="btn btn-primary btn-lg" id="locateBtn">
+            <span>📍</span><span id="locateBtnText">定位我的位置</span>
+        </button>
+        <p class="locate-status" id="locateStatus">未定位</p>
+        <p class="locate-accuracy" id="locateAccuracy" hidden></p>
+
+        <!-- 手动选择位置：定位失败或精度过低时自动展开（省/市/区县） -->
+        <div class="manual" id="manualPanel" hidden>
+            <div class="manual-tip" id="manualTip">定位失败，请手动选择地区（将按该地区中心排序）</div>
+            <div class="manual-row">
+                <select id="selProvince" aria-label="省份"><option value="">选择省份</option></select>
+                <select id="selCity" aria-label="城市" disabled><option value="">选择城市</option></select>
+                <select id="selCounty" aria-label="区县" disabled><option value="">选择区县</option></select>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" id="manualBtn">按该地区查找</button>
+        </div>
+    </section>
+
+    <!-- 搜索与省份筛选 -->
+    <section class="search-row">
+        <input type="search" id="searchInput" placeholder="搜索医院名 / 城市" autocomplete="off">
+        <select id="filterProvince" aria-label="按省份筛选"><option value="">全部省份</option></select>
+    </section>
+
+    <!-- 两级结果 Tab -->
+    <div class="tabs" role="tablist">
+        <button type="button" class="tab active" data-tab="serum" role="tab">
+            有血清 <span class="count" id="countSerum">0</span>
+        </button>
+        <button type="button" class="tab" data-tab="all" role="tab">
+            附近所有医院 <span class="count" id="countAll">0</span>
+        </button>
+    </div>
+
+    <p class="dist-note">显示的是<b>直线距离</b>（约数），实际路程请以导航为准。</p>
+
+    <!-- 结果列表 -->
+    <main class="result-list" id="resultList"></main>
+
+    <!-- 空状态 -->
+    <div class="empty" id="emptyState" hidden>
+        <div class="empty-title">未找到符合条件的医院</div>
+        <div class="empty-sub">请调整筛选条件，或立即拨打急救电话</div>
+        <button type="button" class="btn btn-danger btn-call120" onclick="location.href='tel:120'">
+            立即拨打 120
+        </button>
+    </div>
+
+    <!-- 加载更多 -->
+    <div class="more-wrap" id="moreWrap" hidden>
+        <button type="button" class="btn btn-ghost btn-sm" id="moreBtn">加载更多</button>
+    </div>
+
+</div>
+
+<script src="navigate.js"></script>
+</body>
+</html>

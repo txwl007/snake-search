@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>导航功能 · 自检 verify.html</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body{background:#0f172a;color:#e2e8f0}
+        .app{max-width:900px}
+        .report-title{font-size:20px;font-weight:800;margin:16px 0 8px}
+        .fake-banner{
+            background:#7c2d12;border:1px solid #ea580c;color:#fed7aa;
+            border-radius:10px;padding:10px 12px;margin:10px 0;font-size:13.5px;line-height:1.6
+        }
+        .diag{
+            border-radius:10px;padding:10px 12px;margin:10px 0;font-size:13.5px;line-height:1.6
+        }
+        .diag.ok{background:#052e16;border:1px solid #16a34a;color:#bbf7d0}
+        .diag.bad{background:#450a0a;border:1px solid #dc2626;color:#fecaca}
+        .report-actions{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+        .report-actions button{
+            min-height:44px;padding:10px 16px;border:none;border-radius:10px;
+            background:#2563eb;color:#fff;font-size:15px;font-weight:600;cursor:pointer
+        }
+        .report-actions button.warn{background:#b45309}
+        .report-actions button.danger{background:#b91c1c}
+        .report-actions button.ghost{background:#334155}
+        .hint{color:#94a3b8;font-size:13px;line-height:1.7;margin:6px 0 10px}
+        .sim-status{
+            background:#1e293b;border-radius:10px;padding:10px 12px;margin:8px 0;
+            font-size:13.5px;color:#cbd5e1
+        }
+        .sim-status b{color:#fff}
+        .case{
+            background:#1e293b;border-radius:10px;padding:12px;margin:8px 0;
+            border-left:5px solid #64748b;font-size:14px
+        }
+        .case.pass{border-left-color:#22c55e}
+        .case.fail{border-left-color:#ef4444}
+        .case b{font-size:15px}
+        .case .detail{margin-top:6px;color:#94a3b8;white-space:pre-wrap;word-break:break-all}
+        .case .verdict{float:right;font-weight:800}
+        .case.pass .verdict{color:#22c55e}
+        .case.fail .verdict{color:#ef4444}
+        .summary{margin:12px 0;font-size:16px;font-weight:800}
+        .summary.ok{color:#22c55e}
+        .summary.bad{color:#ef4444}
+        .section-tag{
+            display:inline-block;padding:2px 8px;border-radius:6px;font-size:12px;
+            background:#334155;color:#cbd5e1;margin-left:6px;vertical-align:middle
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+    <h4 class="report-title">蛇小卫 · 导航功能自检</h4>
+
+    <div class="fake-banner">
+        ⚠️ <b>本页使用虚构测试数据，非真实医院、非真实定位。</b>
+        为可复现，定位被替换成固定的北京坐标，医院是虚构的「测试省/测试市/甲区…」。
+        真实数据与真实定位请看 <b>index.html</b>。
+    </div>
+
+    <div class="diag" id="diag">正在检测「定位桩」是否生效…</div>
+
+    <!-- ============ 手动测试台 ============ -->
+    <h4 class="report-title">一、手动降级 / 手动选址 测试台 <span class="section-tag">一步步点着测</span></h4>
+    <p class="hint">
+        点下面按钮模拟不同定位结果，紧接着的「本次结果」会立刻回显；再往下「真实组件区域」能看到状态栏、精度行、手动面板的界面变化。
+    </p>
+    <div class="report-actions">
+        <button type="button" onclick="simSuccess(30)">① 高精度定位 30m</button>
+        <button type="button" class="warn" onclick="simSuccess(800)">② 精度较低 800m</button>
+        <button type="button" class="warn" onclick="simSuccess(1500)">③ 精度过低 1500m（自动展开手动）</button>
+        <button type="button" class="danger" onclick="simError(1)">④ 权限被拒绝 code=1</button>
+        <button type="button" class="danger" onclick="simError(2)">⑤ 位置不可用 code=2</button>
+        <button type="button" class="danger" onclick="simError(3)">⑥ 定位超时 code=3</button>
+        <button type="button" class="ghost" onclick="simReset()">↺ 重置</button>
+    </div>
+    <div class="sim-status" id="simStatus">当前模拟：高精度 30m</div>
+    <div class="sim-status" id="simResult"><b>本次结果：</b>（点上面按钮后显示）</div>
+
+    <!-- ============ 真实组件区 ============ -->
+    <h4 class="report-title">二、真实组件区域 <span class="section-tag">app.js 实际操作对象</span></h4>
+    <div class="disclaimer" id="disclaimer">数据来自各省卫健委公开公示，非实时库存；本工具不提供医疗建议。</div>
+
+    <section class="locator">
+        <button type="button" class="btn btn-primary btn-lg" id="locateBtn">
+            <span class="ico">📍</span><span id="locateBtnText">定位我的位置</span>
+        </button>
+        <p class="locate-status" id="locateStatus">未定位</p>
+        <p class="locate-accuracy" id="locateAccuracy" hidden></p>
+
+        <div class="manual" id="manualPanel" hidden>
+            <div class="manual-tip" id="manualTip">定位失败，请手动选择地区</div>
+            <div class="manual-row">
+                <select id="selProvince" aria-label="省份"><option value="">选择省份</option></select>
+                <select id="selCity" aria-label="城市" disabled><option value="">选择城市</option></select>
+                <select id="selCounty" aria-label="区县" disabled><option value="">选择区县</option></select>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" id="manualBtn">按该地区查找</button>
+        </div>
+    </section>
+
+    <section class="search-row">
+        <input type="search" id="searchInput" placeholder="搜索医院名 / 城市">
+        <select id="filterProvince"><option value="">全部省份</option></select>
+    </section>
+
+    <div class="tabs" role="tablist">
+        <button type="button" class="tab active" data-tab="serum" role="tab">有血清 <span class="count" id="countSerum">0</span></button>
+        <button type="button" class="tab" data-tab="all" role="tab">附近所有医院 <span class="count" id="countAll">0</span></button>
+    </div>
+
+    <main class="result-list" id="resultList"></main>
+
+    <div class="empty" id="emptyState" hidden>
+        <div class="empty-title">未找到符合条件的医院</div>
+        <button type="button" class="btn btn-danger" onclick="location.href='tel:120'">立即拨打 120</button>
+    </div>
+
+    <div class="more-wrap" id="moreWrap" hidden>
+        <button type="button" class="btn btn-ghost btn-sm" id="moreBtn">加载更多</button>
+    </div>
+
+    <!-- ============ 自动全量自检 ============ -->
+    <h4 class="report-title">三、自动全量自检 <span class="section-tag">点一下跑全部 11 项</span></h4>
+    <div class="report-actions">
+        <button type="button" onclick="runAll()">运行自检</button>
+    </div>
+    <div class="summary" id="summary">未运行</div>
+    <div id="report"></div>
+</div>
+
+<!-- ===================== 受控测试数据与 stub ===================== -->
+<script>
+/* ⚠️ 虚构测试数据：固定坐标 + 虚构医院，仅用于逻辑自检，非真实定位 */
+var TEST = {
+    WGS_LNG: 116.4074,          // 模拟浏览器定位回调返回的 WGS-84（写死的北京坐标）
+    WGS_LAT: 39.9042,
+    GCJ_LNG: 116.41364225,      // 期望转换后的 GCJ-02
+    GCJ_LAT: 39.90560334,
+    mPerDegLng: 85393.840997,
+    mPerDegLat: 111320.0
+};
+function eastKm(km){ return km*1000.0/ TEST.mPerDegLng; }
+function northKm(km){ return km*1000.0/ TEST.mPerDegLat; }
+
+/* 虚构医院数据：档间隔 >>200m，档内 <200m */
+var TEST_HOSPITALS = [
+    {id:1,name:"T1A低血清",province:"测试省",city:"测试市",county:"甲区",
+     address:"甲区路1号",lng:TEST.GCJ_LNG+eastKm(0.100),lat:TEST.GCJ_LAT,
+     phones:[],phonesRaw:[],serum:["抗蝮蛇毒血清"],other:[],
+     hasSerum:true,noStock:false,stockNote:"",sourceUrl:"",updated:"2026-08"},
+    {id:2,name:"T1B高血清",province:"测试省",city:"测试市",county:"甲区",
+     address:"甲区路2号",lng:TEST.GCJ_LNG+eastKm(0.110),lat:TEST.GCJ_LAT,
+     phones:[],phonesRaw:[],serum:["抗蝮蛇毒血清","抗五步蛇毒血清","抗银环蛇毒血清"],other:[],
+     hasSerum:true,noStock:false,stockNote:"",sourceUrl:"",updated:"2026-08"},
+    {id:3,name:"T2A有电话",province:"测试省",city:"测试市",county:"乙区",
+     address:"乙区路9号",lng:TEST.GCJ_LNG+eastKm(1.000),lat:TEST.GCJ_LAT,
+     phones:["010-12345678"],phonesRaw:["010-12345678"],
+     serum:["抗蝮蛇毒血清","抗五步蛇毒血清"],other:[],hasSerum:true,noStock:false,
+     stockNote:"",sourceUrl:"",updated:"2026-08"},
+    {id:4,name:"T2B无电话",province:"测试省",city:"测试市",county:"乙区",
+     address:"乙区路10号",lng:TEST.GCJ_LNG+eastKm(1.009),lat:TEST.GCJ_LAT,
+     phones:[],phonesRaw:[],serum:["抗蝮蛇毒血清","抗五步蛇毒血清"],other:[],
+     hasSerum:true,noStock:false,stockNote:"",sourceUrl:"",updated:"2026-08"},
+    {id:5,name:"T3暂无储备",province:"测试省",city:"测试市",county:"丙区",
+     address:"",lng:TEST.GCJ_LNG+eastKm(3.000),lat:TEST.GCJ_LAT+northKm(3.000),
+     phones:["010-99999999"],phonesRaw:["010-99999999"],serum:[],other:[],
+     hasSerum:false,noStock:true,stockNote:"暂无储备抗蛇毒血清(具备救治能力)",
+     sourceUrl:"",updated:"2026-08"}
+];
+
+/* 安装 fetch stub */
+(function () {
+    var stubFetch = function () {
+        return Promise.resolve({
+            ok: true,
+            status: 200,
+            json: function () {
+                return Promise.resolve({
+                    version: "test", note: "自检数据", count: TEST_HOSPITALS.length,
+                    provinces: ["测试省"], hospitals: TEST_HOSPITALS
+                });
+            }
+        });
+    };
+    try {
+        Object.defineProperty(window, "fetch", { value: stubFetch, configurable: true, writable: true });
+    } catch (e) {
+        window.fetch = stubFetch;
+    }
+})();
+
+/* 可切换的定位行为 —— 用 defineProperty 覆盖只读的 navigator.geolocation */
+window.__geo = { type: "success", accuracy: 30 };
+window.__geoStub = {
+    getCurrentPosition: function (success, error) {
+        var g = window.__geo;
+        setTimeout(function () {
+            if (g.type === "error") {
+                error({ code: g.code, message: "stub" });
+            } else {
+                success({
+                    coords: {
+                        longitude: TEST.WGS_LNG,
+                        latitude: TEST.WGS_LAT,
+                        accuracy: g.accuracy
+                    }
+                });
+            }
+        }, 0);
+    }
+};
+(function () {
+    var ok = false;
+    try {
+        Object.defineProperty(navigator, "geolocation", {
+            value: window.__geoStub, configurable: true, writable: true
+        });
+        ok = (navigator.geolocation === window.__geoStub);
+    } catch (e) {
+        try {
+            navigator.geolocation.getCurrentPosition = window.__geoStub.getCurrentPosition;
+            ok = (navigator.geolocation.getCurrentPosition === window.__geoStub.getCurrentPosition);
+        } catch (e2) { ok = false; }
+    }
+    window.__geoStubOK = ok;
+    window.__fetchStubOK = (window.fetch !== undefined && window.fetch.name !== "fetch");
+})();
+</script>
+
+<!-- 真实被测代码 -->
+<script src="app.js"></script>
+
+<!-- ===================== 手动测试台 + 自动断言 ===================== -->
+<script>
+(function () {
+    "use strict";
+    var reportEl = document.getElementById("report");
+    var summaryEl = document.getElementById("summary");
+    var simStatusEl = document.getElementById("simStatus");
+    var simResultEl = document.getElementById("simResult");
+    var diagEl = document.getElementById("diag");
+    var results = [];
+
+    function wait(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+    function locateOnce(){ document.getElementById("locateBtn").click(); return wait(40); }
+    function cards(){ return Array.prototype.slice.call(document.querySelectorAll("#resultList .card")); }
+    function cardNames(){ return cards().map(function(c){ return c.querySelector(".card-name").textContent; }); }
+    function setSim(text){ simStatusEl.innerHTML = "当前模拟：<b>" + text + "</b>"; }
+
+    function snapshot() {
+        var status = document.getElementById("locateStatus").textContent;
+        var acc = document.getElementById("locateAccuracy");
+        var panel = document.getElementById("manualPanel");
+        return "状态栏=「" + status + "」｜精度行=" +
+            (acc.hidden ? "隐藏" : "「" + acc.textContent + "」") +
+            "｜手动面板=" + (panel.hidden ? "隐藏" : "★已弹出");
+    }
+    function showResult() {
+        simResultEl.innerHTML = "<b>本次结果：</b>" + snapshot();
+        var panel = document.getElementById("manualPanel");
+        if (!panel.hidden) {
+            panel.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+    }
+
+    function check(title, cond, detail) {
+        results.push({ title: title, ok: !!cond, detail: detail || "" });
+    }
+
+    /* ---------- 手动测试台 ---------- */
+    window.simSuccess = function (acc) {
+        window.__geo = { type: "success", accuracy: acc };
+        setSim(acc >= 1000 ? ("精度过低 " + acc + "m（>1000m，应自动展开手动面板）")
+             : acc >= 500 ? ("精度较低 " + acc + "m（≥500m，应有提示）")
+             : ("高精度 " + acc + "m"));
+        document.getElementById("locateBtn").click();
+        setTimeout(showResult, 60);
+    };
+    window.simError = function (code) {
+        window.__geo = { type: "error", code: code };
+        var label = { 1: "权限被拒绝（code=1）", 2: "位置不可用（code=2）", 3: "定位超时（code=3）" }[code];
+        setSim(label + " → 应显示对应文案并展开手动面板");
+        document.getElementById("locateBtn").click();
+        setTimeout(showResult, 60);
+    };
+    window.simReset = function () {
+        window.__geo = { type: "success", accuracy: 30 };
+        setSim("高精度 30m（已重置）");
+        ["selProvince", "selCity", "selCounty"].forEach(function (id) {
+            var s = document.getElementById(id);
+            if (s) { s.selectedIndex = 0; }
+        });
+        document.getElementById("locateBtn").click();
+        setTimeout(showResult, 60);
+    };
+
+    /* ---------- 自动全量自检 ---------- */
+    async function runAll() {
+        results = [];
+        var tabs = document.querySelectorAll(".tab");
+        tabs[0].click();
+
+        window.__geo = { type: "success", accuracy: 30 };
+        await locateOnce();
+
+        var accEl = document.getElementById("locateAccuracy");
+        check("1. 展示定位精度", accEl.hidden === false &&
+              /\u00b1\s*30\s*m/.test(accEl.textContent),
+              "locateAccuracy=" + accEl.textContent);
+
+        check("2. 精度<500m 不提示“精度较低”", accEl.classList.contains("warn") === false,
+              "classList.warn=" + accEl.classList.contains("warn"));
+
+        var distTexts = cards().map(function(c){ return c.querySelector(".card-distance").textContent; });
+        var allKm = distTexts.length > 0 && distTexts.every(function(t){
+            return /^直线距离约 \d+\.\d km$/.test(t);
+        });
+        var noMeter = distTexts.every(function(t){ return t.indexOf(" m") === -1; });
+        check("3. 距离文案=“直线距离约 X.X km”", allKm, distTexts.join(" | "));
+        check("4. 距离不出现“米”制", noMeter, distTexts.join(" | "));
+
+        var order = cardNames();
+        var expectPrefix = ["T1B高血清", "T1A低血清", "T2A有电话", "T2B无电话"];
+        var orderOk = expectPrefix.every(function(n, i){ return order[i] === n; });
+        check("5. 200m 容差排序（血清多优先→有电话优先）", orderOk, "实际顺序=" + order.join(","));
+
+        var nav = document.querySelector("#resultList a[href^='https://uri.amap.com/marker?position=']");
+        check("6. 导航走高德 URI（无需 Key）", !!nav &&
+              nav.getAttribute("href").indexOf("src=%E8%9B%87%E5%B0%8F%E5%8D%AB") !== -1,
+              nav ? nav.getAttribute("href") : "（未找到导航链接）");
+
+        window.__geo = { type: "success", accuracy: 800 };
+        await locateOnce();
+        check("7. 精度 800m 触发“精度较低”提示",
+              document.getElementById("locateAccuracy").classList.contains("warn") &&
+              document.getElementById("locateAccuracy").textContent.indexOf("精度较低") !== -1,
+              document.getElementById("locateAccuracy").textContent);
+
+        window.__geo = { type: "success", accuracy: 1500 };
+        await locateOnce();
+        var panel = document.getElementById("manualPanel");
+        var status = document.getElementById("locateStatus").textContent;
+        check("8. 精度>1000m 自动展开手动选择入口", panel.hidden === false &&
+              status.indexOf("定位精度过低") !== -1, "status=" + status + " panelHidden=" + panel.hidden);
+
+        var errCases = [
+            { code: 1, key: "定位权限被拒绝" },
+            { code: 2, key: "无法获取位置" },
+            { code: 3, key: "定位超时" }
+        ];
+        for (var i = 0; i < errCases.length; i++) {
+            window.__geo = { type: "error", code: errCases[i].code };
+            await locateOnce();
+            var st = document.getElementById("locateStatus").textContent;
+            var vis = document.getElementById("manualPanel").hidden === false;
+            check("9." + (i + 1) + " 错误码 " + errCases[i].code + " → " + errCases[i].key + " 且降级",
+                  st.indexOf(errCases[i].key) !== -1 && vis, "status=" + st + " panelHidden=" + !vis);
+        }
+
+        document.getElementById("selProvince").value = "测试省";
+        document.getElementById("selProvince").dispatchEvent(new Event("change"));
+        document.getElementById("selCity").value = "测试市";
+        document.getElementById("selCity").dispatchEvent(new Event("change"));
+        document.getElementById("selCounty").value = "甲区";
+        document.getElementById("manualBtn").click();
+        await wait(40);
+        var manStatus = document.getElementById("locateStatus").textContent;
+        check("10. 手动选省/市/区县后能重新排序",
+              manStatus.indexOf("已按") !== -1 && cards().length > 0,
+              "status=" + manStatus + " cards=" + cards().length);
+
+        document.querySelectorAll(".tab")[1].click();
+        await wait(10);
+        var allNames = cardNames();
+        var hasT3 = allNames.indexOf("T3暂无储备") !== -1;
+        var badge = document.querySelector("#resultList .badge-nostock");
+        check("11. “附近所有医院”含无血清项并标注“暂无储备”",
+              hasT3 && !!badge && badge.textContent.indexOf("暂无储备") !== -1,
+              "names=" + allNames.join(","));
+
+        document.querySelectorAll(".tab")[0].click();
+        await wait(10);
+
+        // 复位到干净的高精度状态，便于手动测试
+        window.__geo = { type: "success", accuracy: 30 };
+
+        render();
+    }
+
+    function render() {
+        var pass = results.filter(function(r){ return r.ok; }).length;
+        var total = results.length;
+        summaryEl.textContent = "结果：" + pass + " / " + total + " 通过" + (pass === total ? " ✅ 全部通过" : " ❌ 存在失败项");
+        summaryEl.className = "summary " + (pass === total ? "ok" : "bad");
+        reportEl.innerHTML = results.map(function(r){
+            return '<div class="case ' + (r.ok ? "pass" : "fail") + '">' +
+                '<span class="verdict">' + (r.ok ? "PASS" : "FAIL") + '</span>' +
+                '<b>' + r.title + '</b>' +
+                '<div class="detail">' + (r.detail || "") + '</div>' +
+                '</div>';
+        }).join("");
+    }
+
+    window.runAll = runAll;
+
+    function boot() {
+        var gok = window.__geoStubOK;
+        if (gok) {
+            diagEl.className = "diag ok";
+            diagEl.innerHTML = "✅ 定位桩已生效：点下面的按钮会用<b>模拟定位</b>（不会调用浏览器真实定位）。" +
+                " 自动自检请点「三、运行自检」。";
+        } else {
+            diagEl.className = "diag bad";
+            diagEl.innerHTML = "❌ 定位桩未能生效！本页可能无法模拟定位。请用浏览器打开控制台查看报错，" +
+                "并确认通过 <b>http://localhost:8001/verify.html</b> 访问（不要 file:// 双击）。";
+        }
+        setSim("高精度 30m（页面默认）");
+        setTimeout(runAll, 80);
+    }
+
+    if (document.readyState === "complete") { boot(); }
+    else { window.addEventListener("load", boot); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+{
+    "中介蝮": {
+        "serum": "抗蝮蛇毒血清",
+        "venom": "剧毒",
+        "riskLevel": 2,
+        "riskLabel": "高风险",
+        "riskNote": "毒性强、致死或致残率高，请立即就医"
+    },
+    "中华珊瑚蛇": {
+        "serum": "无专用血清，以对症支持治疗为主",
+        "venom": "剧毒",
+        "riskLevel": 3,
+        "riskLabel": "低风险",
+        "riskNote": "少见但剧毒，仍请就医观察"
+    },
+    "原矛头蝮": {
+        "serum": "抗蝮蛇毒血清",
+        "venom": "剧毒",
+        "riskLevel": 1,
+        "riskLabel": "极高风险",
+        "riskNote": "我国最常见的致伤毒蛇，请立即就医"
+    },
+    "尖吻蝮": {
+        "serum": "抗五步蛇毒血清",
+        "venom": "剧毒",
+        "riskLevel": 2,
+        "riskLabel": "高风险",
+        "riskNote": "毒性强、致死或致残率高，请立即就医"
+    },
+    "白唇竹叶青": {
+        "serum": "抗蝮蛇毒血清为主，重症考虑联合用药",
+        "venom": "剧毒",
+        "riskLevel": 1,
+        "riskLabel": "极高风险",
+        "riskNote": "我国最常见的致伤毒蛇，请立即就医"
+    },
+    "眼镜王蛇": {
+        "serum": "抗眼镜蛇毒血清联合抗银环蛇毒血清",
+        "venom": "剧毒",
+        "riskLevel": 2,
+        "riskLabel": "高风险",
+        "riskNote": "毒性强、致死或致残率高，请立即就医"
+    },
+    "短尾蝮": {
+        "serum": "抗蝮蛇毒血清",
+        "venom": "剧毒",
+        "riskLevel": 1,
+        "riskLabel": "极高风险",
+        "riskNote": "我国最常见的致伤毒蛇，请立即就医"
+    },
+    "福建竹叶青": {
+        "serum": "抗蝮蛇毒血清为主，重症考虑联合用药",
+        "venom": "剧毒",
+        "riskLevel": 1,
+        "riskLabel": "极高风险",
+        "riskNote": "我国最常见的致伤毒蛇，请立即就医"
+    },
+    "红脖颈槽蛇": {
+        "serum": "一般无需抗蛇毒血清，对症处理",
+        "venom": "微毒",
+        "riskLevel": 3,
+        "riskLabel": "低风险",
+        "riskNote": "毒性较弱，仍请就医观察"
+    },
+    "舟山眼镜蛇": {
+        "serum": "抗眼镜蛇毒血清",
+        "venom": "剧毒",
+        "riskLevel": 2,
+        "riskLabel": "高风险",
+        "riskNote": "毒性强、致死或致残率高，请立即就医"
+    },
+    "虎斑颈槽蛇": {
+        "serum": "一般无需抗蛇毒血清，对症处理",
+        "venom": "微毒",
+        "riskLevel": 3,
+        "riskLabel": "低风险",
+        "riskNote": "毒性较弱，仍请就医观察"
+    },
+    "金环蛇": {
+        "serum": "抗银环蛇毒血清",
+        "venom": "剧毒",
+        "riskLevel": 2,
+        "riskLabel": "高风险",
+        "riskNote": "毒性强、致死或致残率高，请立即就医"
+    },
+    "银环蛇": {
+        "serum": "抗银环蛇毒血清",
+        "venom": "剧毒",
+        "riskLevel": 2,
+        "riskLabel": "高风险",
+        "riskNote": "毒性强、致死或致残率高，请立即就医"
+    }
+}

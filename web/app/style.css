@@ -1,0 +1,381 @@
+/* ========== 基础重置 ========== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                 "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: #f5f5f5;
+    color: #333;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+#app {
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: #f5f5f5;
+    position: relative;
+}
+
+/* ========== 页面切换 ========== */
+.page { display: none; padding-bottom: 72px; }
+.page.active { display: block; }
+
+.page-header {
+    background: #fff;
+    padding: 16px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+.page-header h1 { font-size: 18px; font-weight: 600; }
+.subtitle { font-size: 13px; color: #999; margin-top: 4px; }
+
+/* ========== 卡片 ========== */
+.card {
+    background: #fff;
+    border-radius: 10px;
+    margin: 12px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.card-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* ========== 必填红星（可复用样式 1） ========== */
+.required-star { color: #e74c3c; margin-left: 2px; }
+
+/* ========== 表单项 ========== */
+.form-item { margin-bottom: 16px; }
+.form-item:last-child { margin-bottom: 0; }
+
+.form-label {
+    display: block;
+    font-size: 15px;
+    color: #333;
+    margin-bottom: 8px;
+}
+.inline-label { margin-bottom: 0; flex-shrink: 0; }
+
+.form-input, .form-select, .form-textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 15px;
+    background: #fff;
+    outline: none;
+    -webkit-appearance: none;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: #3498db;
+}
+.form-textarea { resize: vertical; }
+
+/* ========== 单选行（可复用样式 2） ========== */
+.select-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #fff;
+}
+.select-value {
+    flex: 1;
+    text-align: right;
+    color: #999;
+    padding-right: 8px;
+    font-size: 15px;
+}
+.select-value.selected { color: #333; }
+.select-arrow { color: #ccc; font-size: 22px; line-height: 1; }
+
+/* ========== 两列 checkbox 网格（可复用样式 3） ========== */
+.checkbox-grid { display: flex; flex-wrap: wrap; }
+.checkbox-item {
+    width: 50%;
+    display: flex;
+    align-items: center;
+    padding: 6px 0;
+    cursor: pointer;
+}
+.checkbox-item input[type="checkbox"] {
+    margin-right: 6px;
+    width: 16px;
+    height: 16px;
+    accent-color: #3498db;
+}
+.checkbox-item label { font-size: 14px; cursor: pointer; }
+
+/* ========== 底部通栏按钮 ========== */
+.bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    padding: 12px 16px;
+    background: #fff;
+    border-top: 1px solid #eee;
+    z-index: 100;
+    box-sizing: border-box;
+}
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    background: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+}
+.btn-primary:active { background: #2980b9; }
+.btn-secondary {
+    width: 100%;
+    padding: 12px;
+    background: #fff;
+    color: #3498db;
+    border: 1px solid #3498db;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* ========== 伤口判断卡片 ========== */
+.wound-examples { display: flex; gap: 8px; margin-bottom: 10px; }
+.wound-img-wrap { flex: 1; }
+.wound-img-wrap img {
+    width: 100%;
+    border-radius: 6px;
+    display: block;
+    aspect-ratio: 1;
+    object-fit: cover;
+}
+.img-placeholder {
+    width: 100%;
+    aspect-ratio: 1;
+    background: #f0f0f0;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 12px;
+    color: #999;
+    padding: 8px;
+}
+.wound-tip { font-size: 14px; color: #555; margin-bottom: 4px; }
+.wound-note { font-size: 12px; color: #999; margin-top: 8px; }
+
+/* 毒蛇 / 无毒蛇 对照块 */
+.wound-block {
+    border: 1px solid #e3e6e8;
+    border-left: 4px solid #bbb;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    background: #fafbfc;
+}
+.wound-safe  { border-left-color: #27ae60; background: #f4fbf6; }
+.wound-danger{ border-left-color: #e74c3c; background: #fdf5f4; }
+.wound-block-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.wound-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .5px;
+}
+.wound-badge-safe   { background: #27ae60; }
+.wound-badge-danger { background: #e74c3c; }
+.wound-hint { font-size: 12px; color: #888; }
+.wound-block .wound-img-wrap img { aspect-ratio: 4/3; object-fit: contain; background: rgba(0,0,0,.04); }
+.wound-features { margin: 6px 0 0; padding-left: 20px; }
+.wound-features li { font-size: 13px; color: #444; line-height: 1.7; }
+.wound-block.wound-safe .wound-features li::marker   { color: #27ae60; }
+.wound-block.wound-danger .wound-features li::marker { color: #e74c3c; }
+
+.upload-area { margin-top: 12px; }
+.upload-btn {
+    display: block;
+    text-align: center;
+    padding: 10px;
+    border: 1px dashed #3498db;
+    border-radius: 6px;
+    color: #3498db;
+    cursor: pointer;
+    font-size: 14px;
+}
+.wound-preview { margin-top: 8px; position: relative; }
+.wound-preview img {
+    width: 100%;
+    border-radius: 6px;
+    display: block;
+}
+.remove-preview {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+/* ========== 单选弹出面板（Action Sheet） ========== */
+.select-panel-mask {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 200;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+.select-panel {
+    width: 100%;
+    max-width: 480px;
+    background: #fff;
+    border-radius: 12px 12px 0 0;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+.select-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    position: sticky;
+    top: 0;
+    background: #fff;
+}
+.select-panel-title { font-size: 15px; font-weight: 500; }
+.select-panel-cancel {
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 14px;
+    cursor: pointer;
+}
+.select-panel-options { padding: 4px 0; }
+.select-panel-option {
+    padding: 14px 16px;
+    font-size: 15px;
+    border-bottom: 1px solid #f5f5f5;
+    cursor: pointer;
+}
+.select-panel-option:active { background: #f5f5f5; }
+.select-panel-option.selected { color: #3498db; font-weight: 500; }
+
+/* ========== 校验错误提示 ========== */
+.error-msg {
+    color: #e74c3c;
+    font-size: 13px;
+    margin-top: 4px;
+    display: none;
+}
+.error-msg.show { display: block; }
+.form-item.has-error .select-row,
+.form-item.has-error .form-input,
+.form-item.has-error .form-select { border-color: #e74c3c; }
+
+/* ========== 结果页 ========== */
+.summary-row {
+    display: flex;
+    padding: 8px 0;
+    border-bottom: 1px solid #f5f5f5;
+    font-size: 14px;
+}
+.summary-row:last-child { border-bottom: none; }
+.summary-label { color: #999; width: 84px; flex-shrink: 0; }
+.summary-value { color: #333; flex: 1; word-break: break-all; }
+
+.result-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f5f5f5;
+}
+.result-item:last-child { border-bottom: none; }
+.result-rank {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #3498db;
+    color: #fff;
+    text-align: center;
+    line-height: 24px;
+    font-size: 12px;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+.result-class { flex: 1; font-size: 15px; }
+.result-confidence { color: #666; font-size: 14px; }
+.result-note { font-size: 12px; color: #e8a735; margin-top: 8px; }
+
+/* ========== 风险标签 ========== */
+.risk-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #fff;
+}
+.risk-tag-1 { background: #e74c3c; }
+.risk-tag-2 { background: #e67e22; }
+.risk-tag-3 { background: #d4ac0d; }
+
+/* ========== 血清建议卡片 ========== */
+.serum-row {
+    display: flex;
+    padding: 8px 0;
+    border-bottom: 1px solid #f5f5f5;
+    font-size: 14px;
+}
+.serum-row:last-child { border-bottom: none; }
+.serum-row-species {
+    align-items: center;
+    font-size: 16px;
+    font-weight: 600;
+}
+.serum-species { flex: 1; }
+.serum-label {
+    color: #999;
+    width: 72px;
+    flex-shrink: 0;
+}
+.serum-value { color: #333; flex: 1; }
+.serum-warning {
+    color: #e74c3c;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 8px 0;
+}
+
+/* ========== 免责声明 ========== */
+.disclaimer {
+    background: #fff7e6;
+    border: 1px solid #ffe0a3;
+}
+.disclaimer p {
+    font-size: 13px;
+    color: #8c6d1f;
+    line-height: 1.6;
+}
